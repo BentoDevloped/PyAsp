@@ -10,7 +10,9 @@ headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleW
            }
 url = r'https://www.fpcu.it/Ricerca/RicercaIscritti.aspx?idop=51'
 
-r = session.get(url, headers=headers)
+url2 = r'https://services.flhsmv.gov/mvcheckpersonalplate/'
+
+r = session.get(url2, headers=headers)
 
 #print(r.text)
 
@@ -20,19 +22,21 @@ r = session.get(url, headers=headers)
 __VIEWSTATE = r.text.split('__VIEWSTATE" value="')[1].split('"')[0]
 __EVENTVALIDATION = r.text.split('__EVENTVALIDATION" value="')[1].split('"')[0]
 __EVENTTARGET = 'ctl00$ContentPlaceHolder1$RicercaAlbo1$CtlButtonSearch'
-__EVENTARGUMENT = r.text.split('__EVENTARGUMENT" value="')[1].split('"')[0]
+#__EVENTARGUMENT = r.text.split('__EVENTARGUMENT" value="')[1].split('"')[0]
 __VIEWSTATEGENERATOR = r.text.split('__VIEWSTATEGENERATOR" value="')[1].split('"')[0]
-__ASYNCPOST = 'true'
+#__ASYNCPOST = 'true'
 #THE DATA PAYLOAD NEED TO CONTAIN VIEWSTATE EVENTTARGET AND THE CLIENTSTATE 
 data = {
     '__VIEWSTATE': __VIEWSTATE,
-    #'__EVENTVALIDATION': __EVENTVALIDATION,
-    '__EVENTTARGET': __EVENTTARGET,
+    '__EVENTVALIDATION': __EVENTVALIDATION,
+    #'__EVENTTARGET': __EVENTTARGET,
     #'ctl00$ContentPlaceHolder1$RicercaAlbo1$cbSezione': 'Sezione A',
-    'ctl00_ContentPlaceHolder1_RicercaAlbo1_cbSezione_ClientState': '{"logEntries":[],"value":"50","text":"Sezione A","enabled":true,"checkedIndices":[],"checkedItemsTextOverflows":false}'
+    #'ctl00_ContentPlaceHolder1_RicercaAlbo1_cbSezione_ClientState': '{"logEntries":[],"value":"50","text":"Sezione A","enabled":true,"checkedIndices":[],"checkedItemsTextOverflows":false}'
+    'ctl00$MainContent$txtInputRowOne': 'bento',
+    'ctl00$MainContent$btnSubmit': 'Submit'
 }
 #print(re.text)
 
-r = session.post(url, headers=headers, data=data)
+r = session.post(url2, headers=headers, data=data)
 
 print(r.text)
