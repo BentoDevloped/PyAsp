@@ -20,9 +20,20 @@ class AspScraper:
         __EVENTVALIDATION = self.get_hidden_value(r.text, '__EVENTVALIDATION')
         __EVENTARGUMENT = self.get_hidden_value(r.text, '__EVENTARGUMENT')
         __VIEWSTATEGENERATOR = self.get_hidden_value(r.text, '__VIEWSTATEGENERATOR')
-        print(__EVENTVALIDATION)
-
-
+        hiddentag = {
+            '__VIEWSTATE': __VIEWSTATE,
+            '__EVENTVALIDATION': __EVENTVALIDATION,
+            '__EVENTARGUMENT': __EVENTARGUMENT,
+            '__VIEWSTATEGENERATOR': __VIEWSTATEGENERATOR
+        }
+        return hiddentag
+    
+    def PostSession(self, headers, data,injectdata):
+        session = requests.Session()
+        data |= injectdata
+        r = session.post(self.url, headers=headers, data=data)
+        return r.text
+   
 
 
 
@@ -31,5 +42,10 @@ class AspScraper:
 
 if __name__ == '__main__':
     scraper = AspScraper('https://services.flhsmv.gov/mvcheckpersonalplate/')
-    scraper.GetAspHiddenTag(s)
-        
+    tag = scraper.GetAspHiddenTag(s)
+    otherData = {
+        'ctl00$MainContent$txtInputRowOne': 'bento',
+        'ctl00$MainContent$btnSubmit': 'Submit'
+    }
+    t = scraper.PostSession(headers=s , data = tag, injectdata = otherData)
+    print(t)
