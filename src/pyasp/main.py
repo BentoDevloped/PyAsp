@@ -13,27 +13,47 @@ class AspScraper:
         return ''
 
     def extract_aspnet_hidden_inputs(self, html: str) -> dict:
-        #WE RETURN A DICTIONARY WITH ALL THE TAG CONTAINED IN THE DIV ASPNETHIDDEN
+        ##IN SOME CASE IT EXIST A CLASS CALLED ASPNETHIDDEN WHERE WE CAN REACH EVERY TAG OF ASP NET, IF THIS CLASS DOESN'T EXIST WE
+        ##SEARCH FOR EVERY CLASS STARTING IN __ SO WE CAN'T GET THE MOST IMPORTAN VIEWSTATE EVENTVALIDATION ECC
         hidden = {}
         marker = 'class="aspNetHidden"'
 
-        for part in html.split(marker)[1:]:
-            if '>' not in part:
-                continue
-            div_body = part.split('>', 1)[1].split('</div>', 1)[0]
+        def is_hidden_input(chunk: str) -> bool:
+            t = (self._get_attr(chunk, "type") or "").strip().lower()
+            return t == "hidden"
 
-            #WE ITERATE FOR EVERY INPUT OF TYPE HIDDEN
-            for chunk in div_body.split('<input')[1:]:
-                if 'type="hidden"' not in chunk and "type='hidden'" not in chunk:
+        ##TRY TO READ INTO ASP NET HIDDEN DIV CLASS
+        if marker in html:
+            for part in html.split(marker)[1:]:
+                if ">" not in part:
+                    continue
+                div_body = part.split(">", 1)[1].split("</div>", 1)[0]
+
+                for chunk in div_body.split("<input")[1:]:
+                    if not is_hidden_input(chunk):
+                        continue
+
+                    name = self._get_attr(chunk, "name")
+                    if not name:
+                        continue
+                    value = self._get_attr(chunk, "value")
+                    hidden[name] = value
+
+        #IF THE CLASS ISN'T FOUND WE SEARCH IN THE ENTIRE HTML
+        if marker not in html or not hidden:
+            for chunk in html.split("<input")[1:]:
+                if not is_hidden_input(chunk):
                     continue
 
-                name = self._get_attr(chunk, 'name')
-                if not name:
+                name = self._get_attr(chunk, "name")
+                if not name or not name.startswith("__"):
                     continue
-                value = self._get_attr(chunk, 'value')  
+
+                value = self._get_attr(chunk, "value")
                 hidden[name] = value
 
         return hidden
+
 
     def get_ct_tags(self, html: str, prefix: str = "ctl00$") -> list:
         ##WE TAKE EVERY HTML TAG STARTING WITH CT WE MIGHT BE WANT TO TAKE THE VALUE IF IT IS ALREADY DECLARED + SORTING NOT WORKING CORRECTLY
@@ -65,19 +85,11 @@ class AspScraper:
     def PostSession(self, headers, data,injectdata):
         session = requests.Session()
         data |= injectdata
+        #print(data)
         r = session.post(self.url, headers=headers, data=data)
-        print(r.status_code)
-        print(session.cookies.get_dict())
+        #print(r.status_code)
+        #print(session.cookies.get_dict())
         return r.text
-    
-    def GetSession(self, headers, data,injectdata):
-        session = requests.Session()
-        data |= injectdata
-        r = session.get(self.url, headers=headers, params=data)
-        print(r.status_code)
-        print(session.cookies.get_dict())
-
-        return r.text   
 
 
 

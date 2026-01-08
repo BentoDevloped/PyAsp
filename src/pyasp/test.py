@@ -13,14 +13,14 @@ if __name__ == '__main__':
     url5 = r'https://anagrafe.cng.it/anagrafe/geometri.aspx'
     url6 = r'https://www.collegio.geometri.cn.it/RicercaIscritti.aspx'
     url7 = r'https://my.libf.ac.uk/ProfessionalServicesRegister.aspx'
-    url8 = r'https://inspectorsearch.api.org/default.aspx'
-    scraper = AspScraper(url8)
+    url8 = r'https://inspectorsearch.api.org/Default.aspx'
+    scraper = AspScraper(url6)
     tag,ct_tag = scraper.GetAspTag(s)
-    #print("tag",ct_tag)
+    #print(tag,"ct_tag")
     otherData = {
-        'ctl00$MainContent$CheckBoxList1$22': 'on',
-        'ctl00$MainContent$SearchName': 'smith',
-
+        'ctl00$ContentPlaceHolder1$NIscr': '2275',
+        '__EVENTTARGET': 'ctl00$ContentPlaceHolder1$btnRicerca'
         }
+    
     t = scraper.PostSession(headers=s , data = tag, injectdata = otherData)
     print(t)
