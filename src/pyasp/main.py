@@ -67,9 +67,17 @@ class AspScraper:
         data |= injectdata
         r = session.post(self.url, headers=headers, data=data)
         print(r.status_code)
+        print(session.cookies.get_dict())
         return r.text
-   
+    
+    def GetSession(self, headers, data,injectdata):
+        session = requests.Session()
+        data |= injectdata
+        r = session.get(self.url, headers=headers, params=data)
+        print(r.status_code)
+        print(session.cookies.get_dict())
 
+        return r.text   
 
 
 
