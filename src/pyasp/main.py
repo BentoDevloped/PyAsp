@@ -15,6 +15,7 @@ class AspScraper:
     def extract_aspnet_hidden_inputs(self, html: str) -> dict:
         ##IN SOME CASE IT EXIST A CLASS CALLED ASPNETHIDDEN WHERE WE CAN REACH EVERY TAG OF ASP NET, IF THIS CLASS DOESN'T EXIST WE
         ##SEARCH FOR EVERY CLASS STARTING IN __ SO WE CAN'T GET THE MOST IMPORTAN VIEWSTATE EVENTVALIDATION ECC
+        ##PROBABLY ADD TO HANDLE THE CASE WHERE ASPNETHIDDEN IS EXIST BUT SOME TAG ARE OUTSIDE OF IT
         hidden = {}
         marker = 'class="aspNetHidden"'
 
@@ -90,23 +91,3 @@ class AspScraper:
         #print(r.status_code)
         #print(session.cookies.get_dict())
         return r.text
-
-
-
-
-
-if __name__ == '__main__':
-    url1 = r'https://services.flhsmv.gov/mvcheckpersonalplate/'
-    url2 = r'https://www.fpcu.it/Ricerca/RicercaIscritti.aspx?idop=51'
-    url3 = r'https://forli.commercialisti.it/albo/'
-    url4 = r'https://www.odcec.rimini.it/albo-iscritti/'
-    url5 = r'https://anagrafe.cng.it/anagrafe/geometri.aspx'
-    url6 = r'https://www.collegio.geometri.cn.it/RicercaIscritti.aspx'
-    scraper = AspScraper(url6)
-    tag,ct_tag = scraper.GetAspTag(s)
-    #print(tag,ct_tag)
-    otherData = {
-        'ctl00$ContentPlaceHolder1$NIscr': '2275',
-    }
-    t = scraper.PostSession(headers=s , data = tag, injectdata = otherData)
-    #print(t)
